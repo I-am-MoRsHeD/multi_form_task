@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import Stepper from './Stepper';
 import PersonalInfoForm from './PersonalInfoForm';
+import JobDetailsForm from './JobDetailsForm';
+import SkillsForm from './SkillsForm';
 
 
 const steps = [
@@ -13,7 +15,7 @@ const steps = [
 ];
 
 const OnboardingFormLayout = () => {
-    const [currentStep, setStep] = useState(0);
+    const [currentStep, setStep] = useState(2);
 
     return (
         <div className='max-w-5xl mx-auto'>
@@ -21,7 +23,8 @@ const OnboardingFormLayout = () => {
                 <Stepper steps={steps} currentStep={currentStep} />
             </div>
             {currentStep === 0 && <PersonalInfoForm />}
-            {/* {currentStep === 0 && <PersonalInfoForm />} */}
+            {currentStep === 1 && <JobDetailsForm />}
+            {currentStep === 2 && <SkillsForm />}
         </div>
     );
 };
