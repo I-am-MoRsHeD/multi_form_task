@@ -1,9 +1,10 @@
 import React from 'react';
+import OnboardingFormLayout from './components/OnboardingFormLayout';
 
 const page = () => {
     return (
         <div>
-            This is onboard page
+            <OnboardingFormLayout />
         </div>
     );
 };
