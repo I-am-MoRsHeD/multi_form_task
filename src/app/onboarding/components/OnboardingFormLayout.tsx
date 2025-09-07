@@ -84,7 +84,6 @@ const OnboardingFormLayout = () => {
                     onNext={nextStep}
                     onBack={prevStep}
                     disableNext={false}
-                // disableNext={!form.formState.isValid && !form.formState.isValidating}
                 >
                     {currentStep === 0 && <PersonalInfoForm setAge={setAge} />}
                     {currentStep === 1 && <JobDetailsForm selectedDepartment={selectedDepartment as keyof ISkillsByDepartment} setSelectedDepartment={setSelectedDepartment} />}

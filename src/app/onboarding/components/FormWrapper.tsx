@@ -18,30 +18,30 @@ interface FormWrapperProps {
 const FormWrapper = ({ children, currentStep, totalSteps, onNext, onBack, isSubmitting = false, disableNext = false }: FormWrapperProps) => {
     const form = useFormContext<OnboardingSchema>();
 
-    const validateStep = async () => {
-        let fieldsToValidate: (keyof OnboardingSchema)[] = [];
+    // const validateStep = async () => {
+    //     let fieldsToValidate: (keyof OnboardingSchema)[] = [];
 
-        if (currentStep === 0) fieldsToValidate = ["personalInfo"];
-        if (currentStep === 1) fieldsToValidate = ["jobDetails"];
-        if (currentStep === 2) fieldsToValidate = ["skills"];
-        if (currentStep === 3) fieldsToValidate = ["emergency"];
-        if (currentStep === 4) fieldsToValidate = ["confirmation"];
+    //     if (currentStep === 0) fieldsToValidate = ["personalInfo"];
+    //     if (currentStep === 1) fieldsToValidate = ["jobDetails"];
+    //     if (currentStep === 2) fieldsToValidate = ["skills"];
+    //     if (currentStep === 3) fieldsToValidate = ["emergency"];
+    //     // if (currentStep === 4) fieldsToValidate = ["confirmation"];
 
-        const isValid = await form.trigger(fieldsToValidate);
+    //     const isValid = await form.trigger(fieldsToValidate);
 
-        if (isValid) {
-            onNext();
-        } else {
-            console.log("Validation failed on step", currentStep);
-        }
-    };
+    //     if (isValid) {
+    //         onNext();
+    //     } else {
+    //         console.log("Validation failed on step", currentStep);
+    //     }
+    // };
 
     return (
         <div className="bg-white rounded-2xl shadow-md p-6 w-full max-w-3xl mx-auto">
             <form
                 onSubmit={(e) => {
                     e.preventDefault();
-                    validateStep();
+                    onNext()
                 }}
                 className="flex flex-col gap-6"
             >
