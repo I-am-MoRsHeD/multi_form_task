@@ -19,12 +19,17 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { IManagerInfo } from "@/types"
+import { IManagerInfo } from "@/types";
 
-export default function SearchableDropdown({ filteredManagers }: { filteredManagers: IManagerInfo[] }) {
+interface IProps {
+  options: IManagerInfo[];
+  value: "",
+  onChange: (value: string) => void;
+}
+
+export default function SearchableDropdown({ options, value, onChange }: IProps) {
   const id = useId()
   const [open, setOpen] = useState<boolean>(false)
-  const [value, setValue] = useState<string>("");
 
   return (
     <div className="*:not-first:mt-2">
@@ -40,7 +45,7 @@ export default function SearchableDropdown({ filteredManagers }: { filteredManag
           >
             <span className={cn("truncate", !value && "text-muted-foreground")}>
               {value
-                ? filteredManagers?.find((data) => data.name === value)?.name
+                ? options?.find((data) => data.name === value)?.name
                 : "Select manager"}
             </span>
             <ChevronDownIcon
@@ -59,12 +64,12 @@ export default function SearchableDropdown({ filteredManagers }: { filteredManag
             <CommandList>
               <CommandEmpty>No manager found.</CommandEmpty>
               <CommandGroup>
-                {filteredManagers?.map((data) => (
+                {options?.map((data) => (
                   <CommandItem
                     key={data.id}
                     value={data.name}
                     onSelect={(currentValue) => {
-                      setValue(currentValue === value ? "" : currentValue)
+                      onChange(currentValue === value ? "" : currentValue)
                       setOpen(false)
                     }}
                   >

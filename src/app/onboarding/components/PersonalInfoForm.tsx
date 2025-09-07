@@ -7,14 +7,25 @@ import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import ProfilePicture from '@/components/ui/ProfilePicture';
-import { useState } from 'react';
-import { FileMetadata } from '@/hooks/use-file-upload';
-import { useFormContext } from "react-hook-form";
+import { Controller, useFormContext, useWatch } from "react-hook-form";
+import { calculateAge } from "@/utils/date";
+import { useEffect } from "react";
 
-const PersonalInfoForm = () => {
+interface IProps {
+    setAge: (value: number | null) => void;
+}
+
+const PersonalInfoForm = ({ setAge }: IProps) => {
     const { control } = useFormContext();
-    const [image, setImage] = useState<(File | FileMetadata) | null>(null);
 
+    const dob = useWatch({
+        control,
+        name: 'personalInfo.dob'
+    });
+
+    useEffect(() => {
+        setAge(dob ? calculateAge(dob) : null);
+    }, [dob])
 
     return (
         <div className="space-y-8">
@@ -22,10 +33,10 @@ const PersonalInfoForm = () => {
                 {/* name */}
                 <FormField
                     control={control}
-                    name="name"
+                    name="personalInfo.fullName"
                     render={({ field }) => (
                         <FormItem className='flex-1'>
-                            <FormLabel>Name</FormLabel>
+                            <FormLabel>Full Name</FormLabel>
                             <FormControl>
                                 <Input placeholder="Jhon Doe" {...field} />
                             </FormControl>
@@ -39,7 +50,7 @@ const PersonalInfoForm = () => {
                 {/* email */}
                 <FormField
                     control={control}
-                    name="email"
+                    name="personalInfo.email"
                     render={({ field }) => (
                         <FormItem className='flex-1'>
                             <FormLabel>Email</FormLabel>
@@ -58,12 +69,12 @@ const PersonalInfoForm = () => {
                 {/* phone */}
                 <FormField
                     control={control}
-                    name="phone"
+                    name="personalInfo.phoneNumber"
                     render={({ field }) => (
                         <FormItem className='flex-1'>
                             <FormLabel>Phone Number</FormLabel>
                             <FormControl>
-                                <Input placeholder="+8801*********" {...field} />
+                                <Input placeholder=" +1-***-***-****" {...field} />
                             </FormControl>
                             <FormDescription className="sr-only">
                                 This is your public phone number
@@ -75,7 +86,7 @@ const PersonalInfoForm = () => {
                 {/* dob */}
                 <FormField
                     control={control}
-                    name="dob"
+                    name="personalInfo.dob"
                     render={({ field }) => (
                         <FormItem className="flex-1 flex flex-col">
                             <FormLabel>Date of birth</FormLabel>
@@ -104,7 +115,7 @@ const PersonalInfoForm = () => {
                                         selected={field.value}
                                         onSelect={field.onChange}
                                         disabled={(date) =>
-                                            date < new Date(new Date().setDate(new Date().getDate() - 1))
+                                            date > new Date(new Date().setDate(new Date().getDate() - 1))
                                         }
                                         captionLayout="dropdown"
                                     />
@@ -119,7 +130,15 @@ const PersonalInfoForm = () => {
                 />
             </div>
             <div>
-                <ProfilePicture setImage={setImage} />
+                <Controller
+                    name="personalInfo.profilePicture"
+                    control={control}
+                    render={({ field }) => (
+                        <ProfilePicture
+                            onChange={field.onChange}
+                        />
+                    )}
+                />
             </div>
         </div>
     );

@@ -1,24 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Checkbox } from '@/components/ui/checkbox';
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useFieldArray, useFormContext } from 'react-hook-form';
+import { useFieldArray, useFormContext, useWatch } from 'react-hook-form';
 import { skillsByDepartment } from '../data/skillsByDepartment';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
-import { cn } from '@/lib/utils';
 import { Textarea } from '@/components/ui/textarea';
+import { ISkillsByDepartment } from '@/types';
 
-interface ISkillFields {
-    id: string;
-    value: string;
-    skill: string;
+interface IProps {
+    selectedDepartment: keyof ISkillsByDepartment;
 };
 
-const SkillsForm = () => {
+const SkillsForm = ({ selectedDepartment }: IProps) => {
     const { control } = useFormContext();
     const { fields: skillFields, append: appendSkill, remove: removeSkill } = useFieldArray({
         control: control,
-        name: "skill",
+        name: "skills.experience",
+    });
+
+    const remotePreference = useWatch({
+        control,
+        name : 'skills.remotePreference'
     });
 
     return (
@@ -26,7 +29,7 @@ const SkillsForm = () => {
             <div className='flex flex-row gap-5'>
                 <FormField
                     control={control}
-                    name="skills"
+                    name="skills.primarySkills"
                     render={() => (
                         <FormItem className='w-1/4'>
                             <div className="mb-4">
@@ -35,11 +38,11 @@ const SkillsForm = () => {
                                     Choose at least 3
                                 </FormDescription>
                             </div>
-                            {skillsByDepartment.Engineering.map((item, idx) => (
+                            {(skillsByDepartment as ISkillsByDepartment)[selectedDepartment]?.map((item: string, idx: number) => (
                                 <FormField
                                     key={idx}
                                     control={control}
-                                    name="skills"
+                                    name="skills.primarySkills"
                                     render={({ field }) => {
                                         return (
                                             <FormItem
@@ -48,7 +51,7 @@ const SkillsForm = () => {
                                             >
                                                 <FormControl>
                                                     <Checkbox
-                                                        checked={field.value?.includes(item)}
+                                                        checked={field?.value?.includes(item)}
                                                         onCheckedChange={(checked) => {
                                                             const current = field.value ?? [];
                                                             if (checked) {
@@ -79,12 +82,12 @@ const SkillsForm = () => {
                     {skillFields.length < 1 ? <div>
                         <h1>Please select your skill first</h1>
                     </div> :
-                        skillFields.map((item : ISkillFields, index : number) => (
+                        skillFields.map((item: any, index: number) => (
                             <div className="flex flex-col gap-2" key={item.id}>
                                 <FormLabel className="text-base">{item?.skill}</FormLabel>
                                 <FormField
                                     control={control}
-                                    name={`skill.${index}.value`}
+                                    name={`skills.experience.${index}.value`}
                                     render={({ field }) => (
                                         <FormItem className="flex-1">
                                             <FormControl>
@@ -102,7 +105,7 @@ const SkillsForm = () => {
             <div className='flex flex-row gap-5'>
                 <FormField
                     control={control}
-                    name="working_hours"
+                    name="skills.preferredHours"
                     render={({ field }) => (
                         <FormItem className='flex-1'>
                             <FormLabel>Preferred Working Hours(start - end)</FormLabel>
@@ -116,20 +119,53 @@ const SkillsForm = () => {
                         </FormItem>
                     )}
                 />
-                <div className='flex-1 flex flex-col justify-between gap-6'>
-                    <FormLabel>Remote preference</FormLabel>
-                    <Slider
-                        defaultValue={[50]}
-                        max={100}
-                        step={1}
-                        className='flex-1'
+                <div className='flex-1 flex flex-col justify-between gap-2'>
+                    <FormField
+                        control={control}
+                        name="skills.remotePreference"
+                        render={({ field }) => (
+                            <FormItem className="flex-1 flex flex-col justify-between gap-6">
+                                <FormLabel>Remote preference</FormLabel>
+                                <FormControl>
+                                    <Slider
+                                        value={[field.value ?? 50]}
+                                        onValueChange={(val) => field.onChange(val[0])}
+                                        max={100}
+                                        step={1}
+                                        className="flex-1"
+                                    />
+                                </FormControl>
+                                <FormDescription>
+                                    {field.value ?? 50}% remote
+                                </FormDescription>
+                                <FormMessage />
+                            </FormItem>
+                        )}
                     />
+
                 </div>
+                {remotePreference > 50 && <FormField
+                    control={control}
+                    name="skills.managerApproved"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-row items-center gap-2">
+                            <FormControl>
+                                <Checkbox
+                                    checked={!!field.value}
+                                    onCheckedChange={(checked) => field.onChange(checked)}
+                                />
+                            </FormControl>
+                            <FormLabel className="text-sm font-normal">
+                                Manager Approved
+                            </FormLabel>
+                        </FormItem>
+                    )}
+                />}
             </div>
             <div>
                 <FormField
                     control={control}
-                    name="extra_notes"
+                    name="skills.extraNotes"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Extra notes (optional)</FormLabel>

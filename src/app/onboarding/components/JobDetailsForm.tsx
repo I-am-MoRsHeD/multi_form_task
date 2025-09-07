@@ -8,17 +8,33 @@ import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import React, { useEffect, useState } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { Controller, useFormContext, useWatch } from 'react-hook-form';
 import { mockManagers } from '../data/mockManagers';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import SearchableDropdown from '@/components/ui/SearchableDropdown';
-import { IManagerInfo } from '@/types';
+import { IManagerInfo, ISkillsByDepartment } from '@/types';
 
-const JobDetailsForm = () => {
+interface IProps {
+    selectedDepartment: keyof ISkillsByDepartment,
+    setSelectedDepartment: (value: string) => void;
+}
+const JobDetailsForm = ({ selectedDepartment, setSelectedDepartment }: IProps) => {
     const { control } = useFormContext();
     const [departments, setDepartments] = useState<string[]>([]);
-    const [selectedDepartment, setSelectedDepartment] = useState<string>();
+    const [paymentType, setPaymentType] = useState<string>('');
     const [managerByDepartment, setManagerByDepartment] = useState<IManagerInfo[]>([]);
+
+    const jobType = useWatch({
+        control,
+        name: 'jobDetails.jobType'
+    });
+    useEffect(() => {
+        if (jobType === 'Contract') {
+            setPaymentType('hourly')
+        } else {
+            setPaymentType('annaul')
+        }
+    }, [jobType])
 
     useEffect(() => {
         const departments = [
@@ -35,11 +51,11 @@ const JobDetailsForm = () => {
     }, [selectedDepartment])
 
     return (
-        <div className='h-screen space-y-8'>
+        <div className='max-h-screen space-y-8'>
             <div className='flex flex-row gap-5 w-full'>
                 <FormField
                     control={control}
-                    name="department"
+                    name="jobDetails.department"
                     render={({ field }) => (
                         <FormItem className='flex-1'>
                             <FormLabel>Department</FormLabel>
@@ -69,7 +85,7 @@ const JobDetailsForm = () => {
                 />
                 <FormField
                     control={control}
-                    name="title"
+                    name="jobDetails.positionTitle"
                     render={({ field }) => (
                         <FormItem className='flex-1'>
                             <FormLabel>Position Title</FormLabel>
@@ -88,7 +104,7 @@ const JobDetailsForm = () => {
                 {/* start date */}
                 <FormField
                     control={control}
-                    name="startDate"
+                    name="jobDetails.startDate"
                     render={({ field }) => (
                         <FormItem className="flex-1 flex flex-col">
                             <FormLabel>Start Date</FormLabel>
@@ -116,9 +132,13 @@ const JobDetailsForm = () => {
                                         mode="single"
                                         selected={field.value}
                                         onSelect={field.onChange}
-                                        disabled={(date) =>
-                                            date > new Date(new Date().setDate(new Date().getDate() - 1))
-                                        }
+                                        disabled={(date) => {
+                                            const today = new Date(new Date().setDate(new Date().getDate() - 1));
+                                            const maxDate = new Date();
+                                            maxDate.setDate(today.getDate() + 90);
+
+                                            return date < today || date > maxDate
+                                        }}
                                         captionLayout="dropdown"
                                     />
                                 </PopoverContent>
@@ -133,7 +153,7 @@ const JobDetailsForm = () => {
                 {/* Job types */}
                 <FormField
                     control={control}
-                    name="type"
+                    name="jobDetails.jobType"
                     render={({ field }) => (
                         <FormItem className="space-y-3 flex-1">
                             <FormLabel>Job Type</FormLabel>
@@ -145,7 +165,7 @@ const JobDetailsForm = () => {
                                 >
                                     <FormItem className="flex items-center gap-3">
                                         <FormControl>
-                                            <RadioGroupItem value="full_time" />
+                                            <RadioGroupItem value="Full Time" />
                                         </FormControl>
                                         <FormLabel className="font-normal">
                                             Full Time
@@ -153,7 +173,7 @@ const JobDetailsForm = () => {
                                     </FormItem>
                                     <FormItem className="flex items-center gap-3">
                                         <FormControl>
-                                            <RadioGroupItem value="part_time" />
+                                            <RadioGroupItem value="Part Time" />
                                         </FormControl>
                                         <FormLabel className="font-normal">
                                             Part Time
@@ -161,7 +181,7 @@ const JobDetailsForm = () => {
                                     </FormItem>
                                     <FormItem className="flex items-center gap-3">
                                         <FormControl>
-                                            <RadioGroupItem value="contract" />
+                                            <RadioGroupItem value="Contract" />
                                         </FormControl>
                                         <FormLabel className="font-normal">
                                             Contract
@@ -177,10 +197,10 @@ const JobDetailsForm = () => {
             <div className='flex flex-row gap-5 w-full'>
                 <FormField
                     control={control}
-                    name="expected_salary"
+                    name="jobDetails.salary"
                     render={({ field }) => (
                         <FormItem className='flex-1'>
-                            <FormLabel>Expected Salary</FormLabel>
+                            <FormLabel>Expected Salary({paymentType})</FormLabel>
                             <FormControl>
                                 <Input type='number' placeholder="" {...field} />
                             </FormControl>
@@ -192,7 +212,17 @@ const JobDetailsForm = () => {
                     )}
                 />
                 <div className='flex-1'>
-                    <SearchableDropdown filteredManagers={managerByDepartment} />
+                    <Controller
+                        name="jobDetails.manager"
+                        control={control}
+                        render={({ field }) => (
+                            <SearchableDropdown
+                                options={managerByDepartment}
+                                value={field.value}
+                                onChange={field.onChange}
+                            />
+                        )}
+                    />
                 </div>
             </div>
         </div >

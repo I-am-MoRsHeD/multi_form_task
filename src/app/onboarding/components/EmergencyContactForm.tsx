@@ -7,7 +7,7 @@ const relationsData = [
     "Mother", "Father", "Brother", "Sister", "Uncle", "Wife", "Husband"
 ]
 
-const EmergencyContactForm = () => {
+const EmergencyContactForm = ({ age }: { age: number }) => {
     const { control } = useFormContext();
 
     return (
@@ -16,7 +16,7 @@ const EmergencyContactForm = () => {
                 {/* contact name */}
                 <FormField
                     control={control}
-                    name="contact_name"
+                    name="emergency.contactName"
                     render={({ field }) => (
                         <FormItem className='flex-1'>
                             <FormLabel>Contact Name</FormLabel>
@@ -35,7 +35,7 @@ const EmergencyContactForm = () => {
                 {/* phone */}
                 <FormField
                     control={control}
-                    name="phone"
+                    name="emergency.phone"
                     render={({ field }) => (
                         <FormItem className='flex-1'>
                             <FormLabel>Phone Number</FormLabel>
@@ -52,7 +52,7 @@ const EmergencyContactForm = () => {
                 {/* relationship */}
                 <FormField
                     control={control}
-                    name="relationship"
+                    name="emergency.relationship"
                     render={({ field }) => (
                         <FormItem className='flex-1'>
                             <FormLabel>Relationship</FormLabel>
@@ -78,11 +78,11 @@ const EmergencyContactForm = () => {
                     )}
                 />
             </div>
-            <div className='flex flex-row gap-5 w-full'>
+            {age < 21 && <div className='flex flex-row gap-5 w-full'>
                 {/* guardian name */}
                 <FormField
                     control={control}
-                    name="guardian_name"
+                    name="emergency.guardian.name"
                     render={({ field }) => (
                         <FormItem className='flex-1'>
                             <FormLabel>Guardian Name</FormLabel>
@@ -99,12 +99,12 @@ const EmergencyContactForm = () => {
                 {/* guardian_phone */}
                 <FormField
                     control={control}
-                    name="guardian_phone"
+                    name="emergency.guardian.phone"
                     render={({ field }) => (
                         <FormItem className='flex-1'>
                             <FormLabel>Guardian Phone Number</FormLabel>
                             <FormControl>
-                                <Input placeholder="+8801*********" {...field} />
+                                <Input placeholder=" +1-***-***-**** " {...field} />
                             </FormControl>
                             <FormDescription className="sr-only">
                                 This is your public phone number
@@ -113,7 +113,7 @@ const EmergencyContactForm = () => {
                         </FormItem>
                     )}
                 />
-            </div>
+            </div>}
         </div>
     );
 };

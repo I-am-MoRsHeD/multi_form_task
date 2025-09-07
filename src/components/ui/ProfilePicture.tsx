@@ -1,15 +1,17 @@
 "use client"
 
 import { AlertCircleIcon, ImageUpIcon, XIcon } from "lucide-react"
-
 import { FileMetadata, useFileUpload } from "@/hooks/use-file-upload"
 import Image from "next/image"
 import { useEffect } from "react";
 
-export default function ProfilePicture({ setImage }: { setImage: (value: (File | FileMetadata) | null) => void; }) {
-  const maxSizeMB = 2
-  const maxSize = maxSizeMB * 1024 * 1024 // 2MB default
+interface IProps {
+  onChange: (value: (File | FileMetadata) | null) => void;
+}
 
+export default function ProfilePicture({ onChange }: IProps) {
+  const maxSizeMB = 2
+  const maxSize = maxSizeMB * 1024 * 1024
   const [
     { files, isDragging, errors },
     {
@@ -26,13 +28,11 @@ export default function ProfilePicture({ setImage }: { setImage: (value: (File |
     maxSize,
   })
 
-  const previewUrl = files[0]?.preview || null
+  const previewUrl = files[0]?.preview || null;
 
   useEffect(() => {
     if (files?.length > 0) {
-      setImage(files[0]?.file)
-    } else {
-      setImage(null);
+      onChange(files[0]?.file)
     }
   }, [files])
 
